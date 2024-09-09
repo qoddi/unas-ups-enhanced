@@ -1,0 +1,404 @@
+<!--[if IE]>
+  <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
+<![endif]-->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>U-NAS</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="/apps/ddns-go/css/ddns-go.css?v=6.0.1&"
+    />
+    <script>
+      window.top.UNAS.SetAppState('DDNS GO', 'active')
+    </script>
+    <script language="JavaScript" type="text/javascript">
+      jQuery.noConflict()
+      ;(function () {
+        getConfig()
+        jQuery('#ddns_go_enable').click(function () {
+          if (jQuery('#ddns_go_enable').prop('checked') == false) {
+            jQuery("[name='ddns_go_input']").attr('disabled', true)
+            if (jQuery('#ddns_go_enable').attr('oldvalue') == 'enable')
+              jQuery('#ddns_go_apply').attr('class', 'unas_button')
+          }
+          if (jQuery('#ddns_go_enable').prop('checked') == true) {
+            jQuery("[name='ddns_go_input']").attr('disabled', false)
+            jQuery('#ddns_go_enable').attr('disabled', false)
+          }
+        })
+        jQuery('#ddns_go_port').keyup(function () {
+          ddnsGoCheckPort()
+        })
+      })()
+
+      function getConfig() {
+        jQuery.ajax({
+          url: '/apps/ddns-go/includes/services_ddns_go.php',
+          type: 'POST',
+          async: true,
+          contentType: 'application/json',
+          data: JSON.stringify({ token: UToken, action: 'getConfig' }),
+          dataType: 'json',
+          timeout: 20000,
+          success: function (data) {
+            if (data.pass == 'exit') {
+              parent.location.assign('/desktop/')
+            } else {
+              if (
+                data.enable == true ||
+                jQuery('#ddns_go_enable').prop('checked')
+              ) {
+                jQuery('#ddns_go_enable').prop('checked', true)
+                jQuery('#ddns_go_enable').attr('oldvalue', 'enable')
+              } else {
+                jQuery("[name='ddns_go_input']").attr('disabled', true)
+                jQuery('#ddns_go_enable').prop('checked', false)
+                jQuery('#ddns_go_enable').attr('oldvalue', 'disable')
+              }
+
+              jQuery('#ddns_go_port').val(data.port)
+              jQuery('#ddns_go_update_interval').val(data.updateInterval)
+              jQuery('#ddns_go_comparison_interval').val(
+                data.comparisonInterval
+              )
+              jQuery('#ddns_go_skip_verify_cert').prop(
+                'checked',
+                data.skipVerifyCert
+              )
+
+              var str = ''
+              const dnss = {
+                '': UNAS._('Default DNS'),
+                '223.5.5.5': UNAS._('Ali DNS (223.5.5.5)'),
+                '223.6.6.6': UNAS._('Ali DNS (223.6.6.6)'),
+                '119.29.29.29': UNAS._('Tencent DNS (119.29.29.29)'),
+                '1.1.1.1': 'CloudFlare DNS(1.1.1.1)',
+                '8.8.4.4': UNAS._('Google DNS(8.8.4.4)'),
+                '8.8.8.8': UNAS._('Google DNS(8.8.8.8)'),
+              }
+              jQuery.each(dnss, function (key, value) {
+                if (key == data.dns) {
+                  str +=
+                    '<option value="' +
+                    key +
+                    '" selected>' +
+                    value +
+                    '</option>'
+                } else {
+                  str += '<option value="' + key + '">' + value + '</option>'
+                }
+              })
+
+              jQuery('#ddns_go_dns').html(str)
+
+              jQuery('#ddns_go_no_web').prop('checked', data.noWeb)
+              jQuery('#ddns_go_apply').attr('class', 'unas_button')
+            }
+          },
+          error: function (XMLHttpRequest, textStatus, errorThrown) {
+            alert(textStatus)
+          },
+        })
+      }
+
+      function ddnsGoCheckPort() {
+        if (ddnsGoCheckPort())
+          jQuery('#ddns_go_apply').attr('class', 'unas_button')
+        else jQuery('#ddns_go_apply').attr('class', 'unas_button_disabled')
+      }
+
+      function ddnsGoCheckPort() {
+        var portState = false
+        var port = parseInt(jQuery.trim(jQuery('#ddns_go_port').val()), 10)
+        if (isNaN(port)) {
+          jQuery('#ddns_go_port').val('')
+        } else {
+          jQuery('#ddns_go_port').val(port)
+        }
+        if (port > 65535 || port < 1) {
+          jQuery('#ddns_go_port_warning').attr('class', 'input_warning_info')
+          jQuery('#ddns_go_port_warning').attr(
+            'title',
+            '* ' + UNAS._('Port should between 1 and 65535')
+          )
+        } else {
+          jQuery.ajax({
+            url: '/apps/ddns-go/includes/services_ddns_go.php',
+            type: 'POST',
+            async: false,
+            contentType: 'application/json',
+            data: JSON.stringify({
+              token: UToken,
+              port: port,
+              action: 'checkport',
+            }),
+            timeout: 20000,
+            dataType: 'json',
+            success: function (data) {
+              if (data === '0') {
+                jQuery('#ddns_go_port_warning').attr(
+                  'class',
+                  'input_warning_info'
+                )
+                jQuery('#ddns_go_port_warning').attr(
+                  'title',
+                  '* ' + UNAS._('Port has been used')
+                )
+              } else {
+                jQuery('#ddns_go_port_warning').attr('class', 'input_warning')
+                jQuery('#ddns_go_port_warning').attr('title', '')
+                portState = true
+              }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+              alert(textStatus)
+            },
+          })
+        }
+        return portState
+      }
+
+      function isNumeric(strval) {
+        var c
+        for (var i = 0; i < strval.length; i++) {
+          c = strval.charAt(i)
+          if (c < '0' || c > '9') {
+            return false
+          }
+        }
+        return true
+      }
+
+      function submit() {
+        if (jQuery('#ddns_go_apply').hasClass('unas_button_disabled')) {
+          return false
+        }
+
+        var enable = jQuery('#ddns_go_enable').prop('checked'),
+          port = jQuery('#ddns_go_port').val(),
+          updateInterval = jQuery('#ddns_go_update_interval').val(),
+          comparisonInterval = jQuery('#ddns_go_comparison_interval').val(),
+          skipVerifyCert = jQuery('#ddns_go_skip_verify_cert').prop('checked'),
+          dns = jQuery('#ddns_go_dns').val(),
+          noWeb = jQuery('#ddns_go_no_web').prop('checked')
+        var params = {
+          token: UToken,
+          enable: enable,
+          port: port,
+          updateInterval: updateInterval,
+          comparisonInterval: comparisonInterval,
+          skipVerifyCert: skipVerifyCert,
+          noWeb: noWeb,
+          action: 'manage',
+        }
+        if (dns && dns !== '') {
+          params.dns = dns
+        }
+        jQuery.ajax({
+          url: '/apps/ddns-go/includes/services_ddns_go.php',
+          type: 'POST',
+          async: true,
+          contentType: 'application/json',
+          data: JSON.stringify(params),
+          timeout: 20000,
+          dataType: 'json',
+          success: function (data) {
+            getConfig()
+          },
+          error: function (XMLHttpRequest, textStatus, errorThrown) {
+            alert(textStatus)
+          },
+        })
+      }
+    </script>
+  </head>
+  <body>
+    <div id="ddns_go" class="ddns_go_manager">
+      <div
+        id="ddns_go_manager_waiting_content"
+        class="unas_loading_modal"
+        style="display: none"
+      ></div>
+      <div
+        id="ddns_go_manager_waiting_logo"
+        class="unas_loading"
+        style="display: none"
+      ></div>
+      <div class="unas_title">
+        <div
+          id="poweroptions_manager_immediately_tab"
+          class="unas_tab_sel"
+          poweroptionsitemtableid="poweroptions_manager_immediately_page"
+        >
+          <span>##$@ddns@$##DDNS GO##$@ddns@$##</span>
+        </div>
+      </div>
+      <div class="unas_content">
+        <div
+          id="jv-unas_content_left"
+          class="unas_content_left"
+          style="
+            position: absolute;
+            width: 100%;
+            left: 0;
+            bottom: 60px;
+            top: 60px;
+          "
+        >
+          <div class="unas_items ddns-item-li">
+            <ul>
+              <li class="unas_item_li" style="margin-bottom: 10px">
+                <span>
+                  <div class="unas_checkbox">
+                    <input type="checkbox" id="ddns_go_enable" oldvalue="" />
+                    <label for="ddns_go_enable"></label>
+                  </div>
+                </span>
+                <span>##$@ddns@$##Enable DDNS GO Service##$@ddns@$##</span>
+              </li>
+              <li class="unas_item_li" style="margin-bottom: 10px">
+                <span class="span_left" style="margin-left: 40px"
+                  >##$@ddns@$##Port:##$@ddns@$##</span
+                ><span
+                  ><input
+                    type="text"
+                    id="ddns_go_port"
+                    name="ddns_go_input"
+                    class="unas_input" /></span
+                ><label class="" id="ddns_go_port_warning" title=""></label>
+              </li>
+              <li class="unas_item_li" style="margin-bottom: 10px">
+                <span class="span_left" style="margin-left: 40px"
+                  >##$@ddns@$##Update Interval:##$@ddns@$##</span
+                ><span
+                  ><input
+                    type="text"
+                    id="ddns_go_update_interval"
+                    name="ddns_go_input"
+                    class="unas_input" /></span
+                ><label
+                  class=""
+                  id="ddns_go_update_interval_warning"
+                  title=""
+                ></label>
+              </li>
+              <li class="unas_item_li" style="margin-bottom: 10px">
+                <span class="span_left" style="margin-left: 40px"
+                  >##$@ddns@$##Comparison Interval:##$@ddns@$##</span
+                ><span
+                  ><input
+                    type="text"
+                    id="ddns_go_comparison_interval"
+                    name="ddns_go_input"
+                    class="unas_input" /></span
+                ><label
+                  class=""
+                  id="ddns_go_comparison_interval_warning"
+                  title=""
+                ></label>
+              </li>
+              <li class="unas_item_li" style="margin-bottom: 10px">
+                <span class="span_left" style="margin-left: 40px"
+                  >##$@ddns@$##Skip verifying certificates:##$@ddns@$##</span
+                ><span>
+                  <div class="unas_checkbox">
+                    <input
+                      type="checkbox"
+                      id="ddns_go_skip_verify_cert"
+                      oldvalue=""
+                    />
+                    <label for="ddns_go_skip_verify_cert"></label>
+                  </div> </span
+                ><label
+                  class=""
+                  id="ddns_go_skip_verify_cert_warning"
+                  title=""
+                ></label>
+              </li>
+              <li class="unas_item_li" style="margin-bottom: 10px">
+                <span class="span_left" style="margin-left: 40px"
+                  >##$@ddns@$##Specify DNS resolution server:##$@ddns@$##</span
+                >
+                <span>
+                  <label class="unas_select_label">
+                    <select
+                      class="unas_select"
+                      id="ddns_go_dns"
+                      name="ddns_go_input"
+                      style="width: 80px"
+                    ></select> </label
+                  ><label class="" id="ddns_go_dns_warning" title=""></label>
+                </span>
+              </li>
+              <li class="unas_item_li" style="margin-bottom: 10px">
+                <span class="span_left" style="margin-left: 40px"
+                  >##$@ddns@$##Do not start web services:##$@ddns@$##</span
+                ><span>
+                  <div class="unas_checkbox">
+                    <input type="checkbox" id="ddns_go_no_web" oldvalue="" />
+                    <label for="ddns_go_no_web"></label>
+                  </div> </span
+                ><label class="" id="ddns_go_no_web_warning" title=""></label>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="unas_content_right">
+          <span class="ddns_go_page_logo"></span>
+        </div>
+      </div>
+      <div class="unas_footer">
+        <button
+          onClick="submit()"
+          class="unas_button_disabled"
+          id="ddns_go_apply"
+        >
+          ##$@ddns@$##Apply##$@ddns@$##
+        </button>
+      </div>
+    </div>
+    <script type="text/javascript">
+      ;(function () {
+        var rt = document.getElementById('ddns_go')
+        var pageTranslators = window.top.UNAS.CreateNodesTranslators(
+          rt.parentNode
+        )
+        var OnChangeLanguage = function (e) {
+          for (var i = 0; i < pageTranslators.length; i++) {
+            var node = pageTranslators[i].node
+            var p = pageTranslators[i].translateProperty
+            node[p] = window.top.UNAS._(pageTranslators[i].originalText)
+          }
+          if (
+            jQuery('#ddns_go_port_warning').attr('class') ==
+            'input_warning_info'
+          ) {
+            ddnsGoCheckPort()
+          }
+        }
+        OnChangeLanguage()
+        window.top.UNAS.Event.addEvent('ChangeLanguage', OnChangeLanguage)
+        window.addEventListener(
+          'unload',
+          function (e) {
+            window.top.UNAS.Event.removeEvent(
+              'ChangeLanguage',
+              OnChangeLanguage
+            )
+            window.top.UNAS.SetAppState('DDNS GO', 'inactive')
+          },
+          false
+        )
+      })()
+
+      jQuery('#jv-unas_content_left').mCustomScrollbar({
+        autoHideScrollbar: true,
+        theme: 'minimal-dark',
+      })
+    </script>
+  </body>
+</html>

@@ -1,0 +1,33 @@
+{
+    "UNASTranslation": [
+        {
+            "language": "简体中文",
+            "table": [
+            	[ "DDNS GO", "ddns", "DDNS GO" ],
+            	[ "DDNS GO", "0", "DDNS GO" ],
+                [ "Enable DDNS GO Service", "ddns", "启动DDNS GO服务" ],
+                [ "Port:", "ddns", "访问端口：" ],
+                [ "Update Interval:", "ddns", "更新间隔：" ],
+                [ "Comparison Interval:", "ddns", "间隔N次与服务商比对：" ],
+                [ "Skip verifying certificates:", "ddns", "跳过验证证书：" ],
+                [ "Specify DNS resolution server:", "ddns", "指定DNS解析服务器：" ],
+                [ "Do not start web services:", "ddns", "不启动web服务：" ],
+                [ "Start DDNS GO Service", "ddns", "启动DDNS GO服务" ],
+                [ "Stop DDNS GO Service", "ddns", "停止DDNS GO服务" ],
+                [ "Port should between 1 and 65535", "0", "端口应该在1到65535之间" ],
+                [ "Port has been used", "0", "端口已经被使用" ],
+                [ "Failed to save configuration", "0", "保存配置失败" ],
+                [ "Default DNS", "0", "默认DNS" ],
+                [ "Ali DNS (223.5.5.5)", "0", "阿里 DNS (223.5.5.5)" ],
+                [ "Ali DNS (223.6.6.6)", "0", "阿里 DNS (223.6.6.6)" ],
+                [ "Tencent DNS (119.29.29.29)", "0", "腾讯 DNS (119.29.29.29)" ],
+                [ "Google DNS(8.8.4.4)", "0", "谷歌 DNS(8.8.4.4)" ],
+                [ "Google DNS(8.8.8.8)", "0", "谷歌 DNS(8.8.8.8)" ],
+                [ "Apply", "ddns", "应 用" ],
+				[ "Enter", "ddns", "确 定" ],
+				[ "Other errors", "ddns", "其他错误" ],
+                [ "Cancel", "ddns", "取 消" ]
+            ]
+        }
+    ]
+}

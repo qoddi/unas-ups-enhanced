@@ -1,0 +1,16 @@
+{
+  "appName": "DDNS GO",
+  "appVersion": "6.0.1",
+  "appJS": "app.js",
+  "appIcon": "images/logo.png",
+  "appScreenshot": "shot.png",
+  "appDeveloper": "青城",
+  "appSection": "Network",
+  "appSize": "1.8M",
+  "appInstalledSize": "2.4M",
+  "appRemovable": "NO",
+  "appTranslationFile": "languages/Translation",
+  "appPackageName": "ddns-go-unas",
+  "appDescription": "This is an U-NAS DDNS App that provides DDNS services through DDNS GO.",
+  "appMobileHTML": ""
+}
