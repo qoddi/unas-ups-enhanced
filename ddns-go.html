@@ -29,9 +29,7 @@
             jQuery('#ddns_go_enable').attr('disabled', false)
           }
         })
-        jQuery('#ddns_go_port').keyup(function () {
-          ddnsGoCheckPort()
-        })
+        jQuery('#ddns_go_port').keyup(ddnsGoCheckPortFunc)
       })()
 
       function getConfig() {
@@ -59,6 +57,20 @@
                 jQuery('#ddns_go_enable').attr('oldvalue', 'disable')
               }
 
+              if (data.enable) {
+                jQuery('#ddns_go_manage').attr(
+                  'url',
+                  'http://' + window.location.hostname + ':' + data.port
+                )
+                jQuery('#ddns_go_manage').attr(
+                  'style',
+                  'width: 120px; display:inline-block;'
+                )
+              } else {
+                jQuery('#ddns_go_manage').attr('style', 'display:none;')
+              }
+
+              jQuery('#ddns_go_config_dir').val(data.configDir)
               jQuery('#ddns_go_port').val(data.port)
               jQuery('#ddns_go_update_interval').val(data.updateInterval)
               jQuery('#ddns_go_comparison_interval').val(
@@ -104,7 +116,7 @@
         })
       }
 
-      function ddnsGoCheckPort() {
+      function ddnsGoCheckPortFunc() {
         if (ddnsGoCheckPort())
           jQuery('#ddns_go_apply').attr('class', 'unas_button')
         else jQuery('#ddns_go_apply').attr('class', 'unas_button_disabled')
@@ -138,14 +150,14 @@
             timeout: 20000,
             dataType: 'json',
             success: function (data) {
-              if (data === '0') {
+              if (data.err === 1) {
                 jQuery('#ddns_go_port_warning').attr(
                   'class',
                   'input_warning_info'
                 )
                 jQuery('#ddns_go_port_warning').attr(
                   'title',
-                  '* ' + UNAS._('Port has been used')
+                  '* ' + UNAS._(data.msg)
                 )
               } else {
                 jQuery('#ddns_go_port_warning').attr('class', 'input_warning')
@@ -178,6 +190,7 @@
         }
 
         var enable = jQuery('#ddns_go_enable').prop('checked'),
+          configDir = jQuery('#ddns_go_config_dir').val(),
           port = jQuery('#ddns_go_port').val(),
           updateInterval = jQuery('#ddns_go_update_interval').val(),
           comparisonInterval = jQuery('#ddns_go_comparison_interval').val(),
@@ -187,6 +200,7 @@
         var params = {
           token: UToken,
           enable: enable,
+          configDir: configDir,
           port: port,
           updateInterval: updateInterval,
           comparisonInterval: comparisonInterval,
@@ -206,12 +220,29 @@
           timeout: 20000,
           dataType: 'json',
           success: function (data) {
+            if (data.err === 0) {
+              jQuery('#ddns_go_info').attr(
+                'style',
+                'display:block;color: #333333'
+              )
+              jQuery('#ddns_go_info').html(UNAS._('Operation successful'))
+            } else {
+              jQuery('#ddns_go_info').attr(
+                'style',
+                'display:block;color: #DF3E21'
+              )
+              jQuery('#ddns_go_info').html(UNAS._(data.msg))
+            }
             getConfig()
           },
           error: function (XMLHttpRequest, textStatus, errorThrown) {
             alert(textStatus)
           },
         })
+      }
+
+      function openDdnsGo() {
+        window.open(jQuery('#ddns_go_manage').attr('url'), '_blank')
       }
     </script>
   </head>
@@ -258,6 +289,21 @@
                   </div>
                 </span>
                 <span>##$@ddns@$##Enable DDNS GO Service##$@ddns@$##</span>
+              </li>
+              <li class="unas_item_li" style="margin-bottom: 10px">
+                <span class="span_left" style="margin-left: 40px"
+                  >##$@ddns@$##Configuration Directory:##$@ddns@$##</span
+                ><span
+                  ><input
+                    type="text"
+                    id="ddns_go_config_dir"
+                    name="ddns_go_input"
+                    class="unas_input" /></span
+                ><label
+                  class=""
+                  id="ddns_go_config_dir_warning"
+                  title=""
+                ></label>
               </li>
               <li class="unas_item_li" style="margin-bottom: 10px">
                 <span class="span_left" style="margin-left: 40px"
@@ -343,6 +389,9 @@
                   </div> </span
                 ><label class="" id="ddns_go_no_web_warning" title=""></label>
               </li>
+              <li class="unas_item_li" style="margin-bottom: 10px">
+                <span id="ddns_go_info" style="display: none"></span>
+              </li>
             </ul>
           </div>
         </div>
@@ -352,12 +401,31 @@
         </div>
       </div>
       <div class="unas_footer">
-        <button
-          onClick="submit()"
-          class="unas_button_disabled"
-          id="ddns_go_apply"
+        <a
+          id="docker_main_button"
+          target="_blank"
+          style="
+            width: 72px;
+            height: 32px;
+            display: inline-block;
+            margin-right: 10px;
+          "
         >
-          ##$@ddns@$##Apply##$@ddns@$##
+          <button
+            onClick="submit()"
+            class="unas_button_disabled"
+            id="ddns_go_apply"
+          >
+            ##$@ddns@$##Apply##$@ddns@$##
+          </button>
+        </a>
+        <button
+          onClick="openDdnsGo()"
+          class="unas_button"
+          id="ddns_go_manage"
+          style="display: none"
+        >
+          ##$@ddns@$##Manage DDNS GO##$@ddns@$##
         </button>
       </div>
     </div>

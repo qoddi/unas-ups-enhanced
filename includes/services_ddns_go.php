@@ -72,6 +72,14 @@ if($action == "getConfig") {
   if (property_exists($jsonObj, 'configDir')) {
     $configDir = $jsonObj->configDir;
   }
+  if (!is_dir($configDir)) {
+    // 配置目录不存在
+    echo json_encode(array(
+      'err' => 2,
+      'msg' => 'Configuration directory is not exist'
+    ));
+    return;
+  }
   // ddns-go的端口，默认9876
   $port = 9876;
   if (property_exists($jsonObj, 'port')) {
@@ -114,16 +122,18 @@ if($action == "getConfig") {
   $configJson = json_encode($configData);
   // 配置文件
   $configFile = '/unas/apps/ddns-go/config/config.json';
-  // if(file_exists($configFile)) {
-  //   // 如果配置文件存在，和修改文件权限和所有者
-  //   if (!chown($configFile, "www-data") || !chmod($configFile, "644")) {
-  //     echo json_encode(array(
-  //       'err' => 1,
-  //       'msg' => 'Failed to change config file permissions and ownership'
-  //     ));
-  //     return;
-  //   }
-  // }
+  if(file_exists($configFile)) {
+    // 如果配置文件存在，和修改文件权限和所有者
+    exec("sudo chown www-data:www-data $configFile");
+    exec("sudo chmod 644 $appFile");
+    // if (!chown($configFile, "www-data") || !chmod($configFile, "644")) {
+    //   echo json_encode(array(
+    //     'err' => 1,
+    //     'msg' => 'Failed to change config file permissions and ownership'
+    //   ));
+    //   return;
+    // }
+  }
   // 将JSON数据写入文件
   $result = file_put_contents($configFile, $configJson);
   if($result == false) {
@@ -138,6 +148,8 @@ if($action == "getConfig") {
   // ddns-go的程序文件
   $appFile = "/unas/apps/ddns-go/sbin/ddns-go";
   // 修改ddns-go的权限和所有者
+  exec("sudo chown www-data:www-data $appFile");
+  exec("sudo chmod 755 $appFile");
   // if (!chown($appFile, "www-data") || !chmod($appFile, "755")) {
   //   echo json_encode(array(
   //     'err' => 1,
@@ -162,31 +174,52 @@ if($action == "getConfig") {
     if (isset($dns) && !empty($dns)) {
       $startServiceCommand = $startServiceCommand." -dns $dns";
     }
-    error_log("安装命令为：".$startServiceCommand);
+    // error_log("安装命令为：".$startServiceCommand);
 
     // 判断DDNS GO服务是否已经安装
     if(checkServiceExist("ddns-go")) {
       // DDNS GO服务已经安装，则执行卸载后再安装
-      error_log("service already exists, uninstalling...");
+      // error_log("service already exists, uninstalling...");
       $result = exec($unInstallServiceCommand." && ".$startServiceCommand);
-      error_log("服务重新安装，结果为：".$result);
+      // error_log("服务重新安装，结果为：".$result);
     } else {
       // DDNS GO服务未安装，则执行安装
       $result = exec($startServiceCommand);
-      error_log("服务安装，结果为：".$result);
+      // error_log("服务安装，结果为：".$result);
     }
   } else {
     // 判断DDNS GO服务是否已经安装
     if(checkServiceExist("ddns-go")) {
       // DDNS GO服务已经安装，则执行卸载
       $result = exec($unInstallServiceCommand);
-      error_log("服务卸载，结果为：".$result);
     }
   }
   echo json_encode(array(
     'err' => 0
   ));
 } if($action == "checkport") {
-
+  $port = $jsonObj->port;
+  if(isset($port)) {
+    if (is_numeric($port)) {
+      if ($port >= 1 && $port <= 65535 ) {
+        if (isPortOccupied($port)) {
+          echo json_encode(array(
+            'err' => 1,
+            'msg' => 'Port has been used'
+          ));
+          return;
+        }
+        echo json_encode(array(
+          'err' => 0
+        ));
+        return;
+      }
+    }
+  }
+  // 返回错误提示
+  echo json_encode(array(
+    'err' => 1,
+    'msg' => 'Port should between 1 and 65535'
+  ));
 }
 ?>

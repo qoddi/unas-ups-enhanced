@@ -6,6 +6,7 @@
             	[ "DDNS GO", "ddns", "DDNS GO" ],
             	[ "DDNS GO", "0", "DDNS GO" ],
                 [ "Enable DDNS GO Service", "ddns", "启动DDNS GO服务" ],
+                [ "Configuration Directory:", "ddns", "配置目录：" ],
                 [ "Port:", "ddns", "访问端口：" ],
                 [ "Update Interval:", "ddns", "更新间隔：" ],
                 [ "Comparison Interval:", "ddns", "间隔N次与服务商比对：" ],
@@ -23,10 +24,13 @@
                 [ "Tencent DNS (119.29.29.29)", "0", "腾讯 DNS (119.29.29.29)" ],
                 [ "Google DNS(8.8.4.4)", "0", "谷歌 DNS(8.8.4.4)" ],
                 [ "Google DNS(8.8.8.8)", "0", "谷歌 DNS(8.8.8.8)" ],
+                [ "Failed to save configuration", "0", "保存配置失败" ],
+                ["Token is empty", "0", "Token为空"],
+                ["User information not obtained", "0", "未获取到用户信息"],
+                ["Configuration directory is not exist", "0", "配置目录不存在"],
+                ["Operation successful", "0", "操作成功"],
                 [ "Apply", "ddns", "应 用" ],
-				[ "Enter", "ddns", "确 定" ],
-				[ "Other errors", "ddns", "其他错误" ],
-                [ "Cancel", "ddns", "取 消" ]
+				[ "Manage DDNS GO", "ddns", "管理DDNS GO" ]
             ]
         }
     ]
