@@ -16,6 +16,7 @@
     </script>
     <script language="JavaScript" type="text/javascript">
       jQuery.noConflict()
+      let usedPort = undefined
       ;(function () {
         getConfig()
         jQuery('#ddns_go_enable').click(function () {
@@ -66,8 +67,10 @@
                   'style',
                   'width: 120px; display:inline-block;'
                 )
+                usedPort = data.port
               } else {
                 jQuery('#ddns_go_manage').attr('style', 'display:none;')
+                usedPort = undefined
               }
 
               jQuery('#ddns_go_config_dir').val(data.configDir)
@@ -117,9 +120,11 @@
       }
 
       function ddnsGoCheckPortFunc() {
-        if (ddnsGoCheckPort())
+        if (ddnsGoCheckPort()) {
           jQuery('#ddns_go_apply').attr('class', 'unas_button')
-        else jQuery('#ddns_go_apply').attr('class', 'unas_button_disabled')
+        } else {
+          jQuery('#ddns_go_apply').attr('class', 'unas_button_disabled')
+        }
       }
 
       function ddnsGoCheckPort() {
@@ -130,10 +135,19 @@
         } else {
           jQuery('#ddns_go_port').val(port)
         }
-        if (port > 65535 || port < 1) {
+        if (usedPort === port) {
+          // 端口可正在用的端口是一样的，不需要验证
+          jQuery('#ddns_go_port_warning').attr('class', 'input_warning')
+          jQuery('#ddns_go_port_warning').attr('title', '')
+          jQuery('#ddns_go_port_warning').html('')
+          portState = true
+        } else if (port > 65535 || port < 1) {
           jQuery('#ddns_go_port_warning').attr('class', 'input_warning_info')
           jQuery('#ddns_go_port_warning').attr(
             'title',
+            UNAS._('Port should between 1 and 65535')
+          )
+          jQuery('#ddns_go_port_warning').html(
             '* ' + UNAS._('Port should between 1 and 65535')
           )
         } else {
@@ -155,13 +169,12 @@
                   'class',
                   'input_warning_info'
                 )
-                jQuery('#ddns_go_port_warning').attr(
-                  'title',
-                  '* ' + UNAS._(data.msg)
-                )
+                jQuery('#ddns_go_port_warning').attr('title', UNAS._(data.msg))
+                jQuery('#ddns_go_port_warning').html('* ' + UNAS._(data.msg))
               } else {
                 jQuery('#ddns_go_port_warning').attr('class', 'input_warning')
                 jQuery('#ddns_go_port_warning').attr('title', '')
+                jQuery('#ddns_go_port_warning').html('')
                 portState = true
               }
             },

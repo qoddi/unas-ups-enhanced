@@ -22,6 +22,13 @@
   margin-right: 60px;
   display: block;
 }
+
 .ddns-item-li .span_left {
   width: 150px;
+}
+
+.ddns-item-li .unas_item_li .input_warning_info {
+  display: block;
+  float: right;
+  color: #f24141;
 }
