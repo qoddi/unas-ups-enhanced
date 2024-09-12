@@ -34,6 +34,11 @@
       })()
 
       function getConfig() {
+        jQuery('#ddns_go_manager_waiting_content').attr(
+          'style',
+          'display:block'
+        )
+        jQuery('#ddns_go_manager_waiting_logo').attr('style', 'display:block')
         jQuery.ajax({
           url: '/apps/ddns-go/includes/services_ddns_go.php',
           type: 'POST',
@@ -111,10 +116,26 @@
 
               jQuery('#ddns_go_no_web').prop('checked', data.noWeb)
               jQuery('#ddns_go_apply').attr('class', 'unas_button')
+              jQuery('#ddns_go_manager_waiting_content').attr(
+                'style',
+                'display:none'
+              )
+              jQuery('#ddns_go_manager_waiting_logo').attr(
+                'style',
+                'display:none'
+              )
             }
           },
           error: function (XMLHttpRequest, textStatus, errorThrown) {
             alert(textStatus)
+            jQuery('#ddns_go_manager_waiting_content').attr(
+              'style',
+              'display:none'
+            )
+            jQuery('#ddns_go_manager_waiting_logo').attr(
+              'style',
+              'display:none'
+            )
           },
         })
       }
@@ -198,9 +219,15 @@
       }
 
       function submit() {
+        jQuery('#ddns_go_info').html('')
         if (jQuery('#ddns_go_apply').hasClass('unas_button_disabled')) {
           return false
         }
+        jQuery('#ddns_go_manager_waiting_content').attr(
+          'style',
+          'display:block'
+        )
+        jQuery('#ddns_go_manager_waiting_logo').attr('style', 'display:block')
 
         var enable = jQuery('#ddns_go_enable').prop('checked'),
           configDir = jQuery('#ddns_go_config_dir').val(),
@@ -246,10 +273,26 @@
               )
               jQuery('#ddns_go_info').html(UNAS._(data.msg))
             }
+            jQuery('#ddns_go_manager_waiting_content').attr(
+              'style',
+              'display:none'
+            )
+            jQuery('#ddns_go_manager_waiting_logo').attr(
+              'style',
+              'display:none'
+            )
             getConfig()
           },
           error: function (XMLHttpRequest, textStatus, errorThrown) {
             alert(textStatus)
+            jQuery('#ddns_go_manager_waiting_content').attr(
+              'style',
+              'display:none'
+            )
+            jQuery('#ddns_go_manager_waiting_logo').attr(
+              'style',
+              'display:none'
+            )
           },
         })
       }
