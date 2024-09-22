@@ -5,7 +5,7 @@
             "table": [
             	[ "DDNS GO", "ddns", "DDNS GO" ],
             	[ "DDNS GO", "0", "DDNS GO" ],
-                [ "Enable DDNS GO Service", "ddns", "启动DDNS GO服务" ],
+                [ "Enable UPS ENHANCED Service", "ddns", "启动UPS ENHANCED服务" ],
                 [ "Configuration Directory:", "ddns", "配置目录：" ],
                 [ "Port:", "ddns", "访问端口：" ],
                 [ "Update Interval:", "ddns", "更新间隔：" ],

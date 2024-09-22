@@ -1,0 +1,282 @@
+<!-- 引入样式文件 -->
+<link rel="stylesheet" href="/apps/ups-enhanced/css/element.css" />
+<link rel="stylesheet" type="text/css" href="/apps/ups-enhanced/css/index.css" />
+<script src="/apps/ups-enhanced/js/vue.global.js"></script>
+<script src="/apps/ups-enhanced/js/element.full.js"></script>
+<script src="/apps/ups-enhanced/js/axios.min.js"></script>
+
+<body>
+
+
+    <div id="app">
+        <div id="unas_app" class="manager">
+            <div class="unas_title">
+                <div id="poweroptions_manager_immediately_tab" class="unas_tab_sel"
+                    poweroptionsitemtableid="poweroptions_manager_immediately_page">
+                    <span>{{appName}}</span>
+                </div>
+
+            </div>
+
+
+        </div>
+
+        <div class="unas_content">
+
+            <el-row>
+                <el-col :span="1">
+
+                </el-col>
+
+                <el-col :span="15">
+                    <el-alert :title="upsAppStatus?'系统apcupsd服务运行中':'系统apcupsd服务未运行或未安装，请前往unas应用中心查看'"
+                        :type="upsAppStatus?'success':'warning'" :closable="false"></el-alert>
+                    <el-form  label-width="auto" style="max-width: 600px">
+                        <el-form-item label="工作模式">
+                            <el-radio-group v-model="formData.workMode">
+                                <el-radio value="1">服务端</el-radio>
+                                <el-radio value="2">客户端</el-radio>
+                            </el-radio-group>
+                        </el-form-item>
+
+                        <el-form-item label="网络ups服务端地址" >
+                            <el-input v-model="formData.serverIp" />
+                        </el-form-item>
+                        <el-form-item label="网络ups服务端端口" >
+                            <el-input v-model="formData.serverPort" />
+                        </el-form-item>
+                    </el-form>
+
+
+
+
+
+
+
+
+                </el-col>
+                <el-col :span="4"></el-col>
+                <el-col :span="4">
+                    <span class="page_logo"></span>
+
+                </el-col>
+            </el-row>
+
+        </div>
+        <div class="unas_footer">
+
+            <el-button type="success" @click="setWorkMode">应用</el-button>
+            <el-button type="danger" @click="restartApp">重启ups服务</el-button>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+</body>
+
+
+<script lang="ts" setup>
+    const { createApp, ref, reactive, onMounted, onUnmounted } = Vue
+    const { ElNotification, ElMessage } = ElementPlus
+    const app = createApp({
+        setup() {
+            const appName = ref('UNAS UPS ENHANCED')
+            const upsAppStatus = ref(false)
+
+            const formData = reactive({
+                workMode: '1',
+                serverIp: '0.0.0.0',
+                serverPort: 3551,
+
+            })
+
+            // 网络ups工作模式 1--服务端  2--客户端
+            const workMode = ref(1);
+
+            const getAppInfo = () => {
+                console.log('get app info function execute')
+                axios.post('/apps/ups-enhanced/includes/services.php',
+                    { token: UToken, action: 'checkUpsServiceStatus' }
+                )
+                    .then(function (response) {
+                        console.log(response)
+
+                        if (response.status !== 200) {
+                            alert('获取ups服务运行状态异常')
+                        } else {
+                            console.log('当前ups服务运行状态:' + response.data.status)
+
+                            upsAppStatus.value = response.data.status;
+
+                        }
+
+
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    })
+                    .finally(function () {
+                        // 总是会执行
+                    });
+            };
+
+
+            //从配置文件中读取工作模式信息
+            const getConfigParam = () => {
+                console.log('get config param function execute')
+                axios.post('/apps/ups-enhanced/includes/services.php',
+                    { token: UToken, action: 'getConfigParam' }
+                )
+                    .then(function (response) {
+
+                        console.log(response)
+
+                        if (response.status !== 200) {
+                            alert('获取config param状态异常')
+                        } else {
+                            console.log('当前config param:' + JSON.stringify(response.data))
+                            formData.workMode = response.data.currentWorkMode.toString();
+                            formData.serverIp = response.data.currentServer.replace('DEVICE ', '').split(':')[0]
+
+
+
+                        }
+
+
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    })
+                    .finally(function () {
+                        // 总是会执行
+                    });
+            };
+
+
+
+            const restartApp = () => {
+                console.log('restart app function execute')
+                axios.post('/apps/ups-enhanced/includes/services.php',
+                    { token: UToken, action: 'restartUpsService' }
+                )
+                    .then(function (response) {
+                        if (response.status !== 200) {
+                            ElMessage({
+                                message: `重启ups服务异常,http状态码不为200`,
+                                type: 'error',
+                            })
+                        } else {
+                            ElMessage({
+                                message: `重启apcupsd已触发,结果:${response.data.status ? '成功' : '失败'}`,
+                                type: response.data.status ? 'success' : 'error',
+                            })
+                            console.log(response.data)
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    })
+                    .finally(function () {
+                        // 总是会执行
+                    });
+            };
+
+            const setWorkMode = () => {
+                let json = {
+                    token: UToken,
+                    action: 'setWorkMode',
+                    mode: parseInt(formData.workMode),
+                    serverAddr: `${formData.serverIp}:${formData.serverPort}`
+                }
+
+                console.log('set work mode function execute,request body:' + JSON.stringify(json))
+                axios.post('/apps/ups-enhanced/includes/services.php',
+                    {
+                        token: UToken,
+                        action: 'setWorkMode',
+                        mode: parseInt(formData.workMode),
+                        serverAddr: `${formData.serverIp}:${formData.serverPort}`
+                    }
+                )
+                    .then(function (response) {
+                        console.log(response)
+
+                        if (response.status !== 200) {
+                            ElMessage({
+                                message: `设置ups工作模式异常,http状态码不为200`,
+                                type: 'error',
+                            })
+                        } else {
+                            ElMessage({
+                                message: `设置ups工作模式,结果:${response.data.status ? '成功' : '失败'}`,
+                                type: response.data.status ? 'success' : 'error',
+                            })
+
+                        }
+
+
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    })
+                    .finally(function () {
+                        // 总是会执行
+                        restartApp()
+                        getConfigParam()
+                        getAppInfo()
+                    });
+            };
+
+
+            // 生命周期创建时运行
+            onMounted(() => {
+                console.log(`the component is now mounted.`)
+                getConfigParam()
+                getAppInfo()
+                //var timer = setInterval(() => { getAppInfo() }, 1000 * 60)
+
+               
+            })
+
+            onUnmounted(() => {
+                console.log('页面关闭');
+                // 页面关闭时的逻辑
+              
+            });
+
+
+
+
+
+
+            return {
+                appName,
+                upsAppStatus,
+                workMode,
+                setWorkMode,
+                formData,
+                restartApp,
+            }
+        },
+
+    })
+
+    app.use(ElementPlus);
+    app.mount('#app')
+</script>

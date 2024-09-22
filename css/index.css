@@ -1,0 +1,17 @@
+
+
+.manager {
+  position: relative;
+  background-color: #ffffff;
+}
+
+.page_logo {
+  width: 128px;
+  height: 128px;
+  background: url(../images/pagelogo.png) no-repeat;
+  margin: 0px auto;
+  margin-right: 60px;
+  display: block;
+}
+
+

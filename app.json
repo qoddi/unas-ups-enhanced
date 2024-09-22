@@ -1,16 +1,16 @@
 {
-  "appName": "DDNS GO",
-  "appVersion": "6.0.1",
+  "appName": "UPSENHANCED",
+  "appVersion": "1.0.0",
   "appJS": "app.js",
   "appIcon": "images/logo.png",
   "appScreenshot": "shot.png",
-  "appDeveloper": "青城",
+  "appDeveloper": "qoddi",
   "appSection": "Network",
   "appSize": "13.1M",
   "appInstalledSize": "13.2M",
   "appRemovable": "NO",
   "appTranslationFile": "languages/Translation",
-  "appPackageName": "ddns-go-unas",
-  "appDescription": "This is an U-NAS DDNS App that provides DDNS services through DDNS GO.",
+  "appPackageName": "ups-enhanced-unas",
+  "appDescription": "This is an enhanced ups app for unas to provide nut connect",
   "appMobileHTML": ""
 }

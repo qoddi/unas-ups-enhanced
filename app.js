@@ -1,28 +1,41 @@
 /**
- * DDNS GO App
- * Defined an App to manage ddns-go
+ * App
+ * Defined an App 
  */
-var DdnsGoApp = DdnsGoApp || {} //Define ddns-go App namespace.
+var mainApp = mainApp || {} //Define App namespace.
+
+
+/**
+ * Define app information
+ */
+var appInfo={
+  name:'UPSENHANCED',
+  appPath:'/apps/ups-enhanced',
+  version:'1.0.0',
+  type:'INTERNET',
+  menuName:'UPS ENHANCED'
+}
+
 /**
  * Constructor UNAS App
  */
-DdnsGoApp.App = function () {
-  this.id = 'DDNS GO'
-  this.name = 'DDNS GO'
-  this.version = '6.0.7'
+mainApp.App = function () {
+  this.id = appInfo.name
+  this.name = appInfo.name
+  this.version = appInfo.version
   this.active = false
-  this.menuIcon = '/apps/ddns-go/images/logo.png?v=6.0.7&'
-  this.shortcutIcon = '/apps/ddns-go/images/logo.png?v=6.0.7&'
-  this.entryUrl = '/apps/ddns-go/ddns-go.html?v=6.0.7&'
+  this.menuIcon = `${appInfo.appPath}/images/logo.png?v=${appInfo.version}&`
+  this.shortcutIcon = `${appInfo.appPath}/images/logo.png?v=${appInfo.version}&`
+  this.entryUrl = `${appInfo.appPath}/index.html?v=${appInfo.version}&`
   var self = this
-  this.DdnsGoAppWindow = function () {
-    if (UNAS.CheckAppState('DDNS GO')) {
+  this.ServiceAppWindow = function () {
+    if (UNAS.CheckAppState(appInfo.name)) {
       return false
     }
     self.window = new MUI.Window({
-      id: 'DdnsGoAppWindow',
-      title: UNAS._('DDNS GO'),
-      icon: '/apps/ddns-go/images/logo_small.png?v=6.0.7&',
+      id: `${appInfo.name}AppWindow`,
+      title: UNAS._(`${appInfo.name}`),
+      icon: `${appInfo.appPath}/images/logo_small.png?v=${appInfo.version}&`,
       loadMethod: 'xhr',
       width: 750,
       height: 480,
@@ -30,29 +43,29 @@ DdnsGoApp.App = function () {
       resizable: true,
       scrollbars: false,
       resizeLimit: { x: [200, 2000], y: [150, 1500] },
-      contentURL: '/apps/ddns-go/ddns-go.html?v=6.0.7&',
-      require: { css: ['/apps/ddns-go/css/ddns-go.css'] },
+      contentURL: `${appInfo.appPath}/index.html?v=${appInfo.version}&`,
+      require: { css: [`${appInfo.appPath}/css/index.css`] },
       onBeforeBuild: function () {
-        UNAS.SetAppOpenedWindow('DDNS GO', 'DdnsGoAppWindow')
+        UNAS.SetAppOpenedWindow(appInfo.name, `${appInfo.name}AppWindow`)
       },
     })
   }
-  this.DdnsGoUninstall = function () {
-    UNAS.RemoveDesktopShortcut('DDNS GO')
-    UNAS.RemoveMenu('DDNS GO')
-    UNAS.RemoveAppFromGroups('DDNS GO', 'ControlPanel')
-    UNAS.RemoveAppFromApps('DDNS GO')
+  this.ServiceUninstall = function () {
+    UNAS.RemoveDesktopShortcut(appInfo.name)
+    UNAS.RemoveMenu(appInfo.name)
+    UNAS.RemoveAppFromGroups(appInfo.name, 'ControlPanel')
+    UNAS.RemoveAppFromApps(appInfo.name)
   }
   new UNAS.Menu(
     'UNAS_App_Internet_Menu',
-    this.name,
+    appInfo.menuName,
     this.menuIcon,
-    'DDNS GO',
+    appInfo.menuName,
     '',
-    this.DdnsGoAppWindow
+    this.ServiceAppWindow
   )
   new UNAS.RegisterToAppGroup(
-    this.name,
+    appInfo.menuName,
     'ControlPanel',
     {
       Type: 'Internet',
@@ -63,23 +76,22 @@ DdnsGoApp.App = function () {
     {}
   )
   var OnChangeLanguage = function (e) {
-    UNAS.SetMenuTitle('DDNS GO', UNAS._('DDNS GO')) //translate menu
-    //UNAS.SetShortcutTitle('DDNS GO', UNAS._('DDNS GO'));
+    UNAS.SetMenuTitle(appInfo.name, UNAS._(appInfo.name)) //translate menu
     if (typeof self.window !== 'undefined') {
-      UNAS.SetWindowTitle('DdnsGoAppWindow', UNAS._('DDNS GO'))
+      UNAS.SetWindowTitle(`${appInfo.name}AppWindow`, UNAS._(appInfo.name))
     }
   }
   UNAS.LoadTranslation(
-    '/apps/ddns-go/languages/Translation?v=' + this.version,
+    `${appInfo.appPath}/languages/Translation?v=${this.version}`,
     OnChangeLanguage
   )
   UNAS.Event.addEvent('ChangeLanguage', OnChangeLanguage)
   UNAS.CreateApp(
     this.name,
     this.shortcutIcon,
-    this.DdnsGoAppWindow,
-    this.DdnsGoUninstall
+    this.ServiceAppWindow,
+    this.Serviceninstall
   )
 }
 
-new DdnsGoApp.App()
+new mainApp.App()
