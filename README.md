@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # unas-ups-enhanced
 适用于万由UANS的UPS增强程序，通过webui调整acpupsd配置文件实现网络UPS的支持
 
