@@ -31,7 +31,7 @@
                 <el-col :span="15">
                     <el-alert :title="upsAppStatus?'系统apcupsd服务运行中':'系统apcupsd服务未运行或未安装，请前往unas应用中心查看'"
                         :type="upsAppStatus?'success':'warning'" :closable="false"></el-alert>
-                    <el-form  label-width="auto" style="max-width: 600px">
+                    <el-form  label-width="auto" style="max-width: 600px" v-show="upsAppStatus">
                         <el-form-item label="工作模式">
                             <el-radio-group v-model="formData.workMode">
                                 <el-radio value="1">服务端</el-radio>
@@ -63,7 +63,7 @@
             </el-row>
 
         </div>
-        <div class="unas_footer">
+        <div class="unas_footer" v-show="upsAppStatus">
 
             <el-button type="success" @click="setWorkMode">应用</el-button>
             <el-button type="danger" @click="restartApp">重启ups服务</el-button>
@@ -109,8 +109,8 @@
             // 网络ups工作模式 1--服务端  2--客户端
             const workMode = ref(1);
 
-            const getAppInfo = () => {
-                console.log('get app info function execute')
+            const getDependencyInfo = () => {
+                console.log('get dependency info function execute')
                 axios.post('/apps/ups-enhanced/includes/services.php',
                     { token: UToken, action: 'checkUpsServiceStatus' }
                 )
@@ -239,7 +239,7 @@
                         // 总是会执行
                         restartApp()
                         getConfigParam()
-                        getAppInfo()
+                        getDependencyInfo()
                     });
             };
 
@@ -248,7 +248,7 @@
             onMounted(() => {
                 console.log(`the component is now mounted.`)
                 getConfigParam()
-                getAppInfo()
+                getDependencyInfo()
                 //var timer = setInterval(() => { getAppInfo() }, 1000 * 60)
 
                

@@ -10,7 +10,7 @@
   "appInstalledSize": "13.2M",
   "appRemovable": "NO",
   "appTranslationFile": "languages/Translation",
-  "appPackageName": "ups-enhanced-unas",
+  "appPackageName": "ups-enhanced-ext",
   "appDescription": "This is an enhanced ups app for unas to provide nut connect",
   "appMobileHTML": ""
 }
