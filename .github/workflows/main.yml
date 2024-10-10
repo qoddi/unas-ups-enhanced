@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         platform: [ ubuntu-latest ]
-        zipname: [ ups-enhanced-ext_config.zip ]
+        zipname: [ ups-enhanced-ext.zip ]
     name: Release
     runs-on: ${{ matrix.platform }}
     steps:
